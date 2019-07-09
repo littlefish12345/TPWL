@@ -6,3 +6,5 @@ In the future versions, it will be able to add more add-ons to make it more usef
 Please use this project correctly, thanks (but not for me :-D).
 
 May the force be with you. Always.
+
+p.s. You need to install rsa module to use this.
