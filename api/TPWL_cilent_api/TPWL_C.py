@@ -1,7 +1,7 @@
 import socket,rsa,time
 
 def version():
-    return 0.01
+    return "beta0.1"
 
 class TPWL_C():
     def __init__(self,buffsize):
