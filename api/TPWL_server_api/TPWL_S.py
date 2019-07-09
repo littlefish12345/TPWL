@@ -1,7 +1,7 @@
 import os,socket,rsa,time
 
 def version():
-    return 0.01
+    return "beta0.1"
 
 class TPWL_CONN():
     def __init__(self,conn,s_keys,g_keys,buffsize,times):
