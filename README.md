@@ -11,4 +11,6 @@ p.s. You need to install rsa module to use this.
 
 New features
 
-v0.1 The first version.Add auto encryption the pack witch you send.
+v0.12 Fix some bugs.
+
+v0.1 Add encryption when you send a pack.
