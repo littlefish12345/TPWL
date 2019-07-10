@@ -7,7 +7,7 @@ Please use this project correctly, thanks (but not for me :-D).
 
 May the force be with you. Always.
 
-p.s. You need to install rsa module to use this.
+p.s. You need to install rsa module before using this module.
 
 New features
 
