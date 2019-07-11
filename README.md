@@ -11,6 +11,8 @@ p.s. You need to install rsa module before using this module.
 
 New features
 
+v0.12 Add comments.Remove some useless codes.
+
 v0.11 Fix some bugs.
 
 v0.1 Add encryption when you send a pack.
