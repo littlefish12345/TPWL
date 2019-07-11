@@ -1,7 +1,7 @@
 import rsa,time
 from socket import *
 
-def version(): #打印版本号
+def version(): #返回版本号
     return 'beta 0.12'
 
 class TPWL_CONN: #定义通讯类
