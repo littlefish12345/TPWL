@@ -2,7 +2,7 @@ import rsa,time
 from socket import *
 
 def version(): #返回版本号
-    return 'beta 0.12'
+    return 'beta 0.15'
 
 class TPWL_CONN: #定义通讯类
     def __init__(self,conn,s_key,g_key): #获取来自服务端类的收发密钥(公钥)
