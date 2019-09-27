@@ -11,10 +11,12 @@ p.s. You need to install rsa module before using this module.
 
 New features
 
-v0.15 Make two libs together.
+beta 0.17 Fix some bugs.
 
-v0.12 Add comments.Remove some useless codes.
+beta 0.15 Make two libs together.
 
-v0.11 Fix some bugs.
+beta 0.12 Add comments.Remove some useless codes.
 
-v0.1 Add encryption when you send a pack.
+beta 0.11 Fix some bugs.
+
+beta 0.1 Add encryption when you send a pack.
