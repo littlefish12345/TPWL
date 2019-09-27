@@ -2,29 +2,55 @@ import rsa,time
 from socket import *
 
 def version(): #返回版本号
-    return 'beta 0.15'
+    return 'beta 0.17'
 
 class TPWL_CONN: #定义通讯类
-    def __init__(self,conn,s_key,g_key): #获取来自服务端类的收发密钥(公钥)
+    def __init__(self,conn,s_key,g_key,bits): #获取来自服务端类的收发密钥(公钥)
         self.conn = conn
         self.s_key = s_key
         self.g_key = g_key
+        self.bits = bits
     
     def recv(self,buffsize): #接收数据
-        
+        data_list = []
         data = self.conn.recv(buffsize) #接收来自客户端的数据
-        
-        decoded = rsa.decrypt(data, self.g_key[1]) #解密数据
+        while True:
+            data_list.append(data)
+            data = self.conn.recv(buffsize) #反复接收来自客户端的数据
+            if data == b'done':
+                break
+        decoded_list = []
 
-        return decoded #返回解密后的数据
+        for data_encoded in data_list:
+            decoded = rsa.decrypt(data_encoded, self.g_key[1]) #反复解密数据
+            decoded_list.append(decoded)
+        
+        all_decoded = b''.join(decoded_list)
+        
+        return all_decoded #返回解密后的数据
     
     def send(self,data): #发送数据
-        
-        added_data = rsa.encrypt(data,self.s_key) #用接收成功的公钥加密
-        
-        self.conn.send(added_data) #把加密后的数据发送至服务器
+        data_list = []
+        i = 0
+        max_message = round(self.bits/8-11)
 
-        return 0 #发送成功返回0
+        while True:
+            if len(data)-1 <= (i+1)*max_message:
+                data_list.append(data[i*max_message:])
+                break
+            data_list.append(data[i*max_message:(i+1)*max_message])
+            i = i+1
+
+        encoded_list = []
+        for data_for in data_list:
+            added_data = rsa.encrypt(data_for,self.s_key) #用接收成功的公钥加密
+            encoded_list.append(added_data)
+
+        for encoded_send in encoded_list:
+            self.conn.send(encoded_send) #把加密后的数据发送至客户端
+            time.sleep(0.05)
+        time.sleep(0.05)
+        self.conn.send(b'done')
 
     def close(self): #关闭这个连接
         self.conn.close()
@@ -35,11 +61,11 @@ class TPWL_S: #定义服务端类
         
     def bind(self,addr): #绑定地址
         self.s.bind(addr)
-        return 0
+        return
 
     def listen(self,num): #监听端口
         self.s.listen(num)
-        return 0
+        return
 
     def accept(self): #获取连接并进行协议交换公钥
         conn,addr = self.s.accept() #获取连接
@@ -56,7 +82,7 @@ class TPWL_S: #定义服务端类
 
         conn.send(g_key[0].save_pkcs1()) #发送公钥
 
-        conn = TPWL_CONN(conn,s_key,g_key) #创建TPWL通讯类
+        conn = TPWL_CONN(conn,s_key,g_key,bits) #创建TPWL通讯类
         
         return conn,addr #返回TPWL通讯类和客户端
 
@@ -90,22 +116,48 @@ class TPWL_C: #定义客户端类
         
         return 0 #协议通讯成功返回0
 
-    def send(self,data): #发送数据
-        
-        added_data = rsa.encrypt(data,self.s_key) #用接收成功的公钥加密
-
-        self.s.send(added_data) #把加密后的数据发送至服务器
-        
-        return 0 #发送成功返回0
-
     def recv(self,buffsize): #接收数据
-        
+        data_list = []
+        data = self.s.recv(buffsize) #接收来自客户端的数据
+        while True:
+            data_list.append(data)
+            data = self.s.recv(buffsize) #反复接收来自客户端的数据
+            if data == b'done':
+                break
+        decoded_list = []
 
-        data = self.s.recv(buffsize) #接收来自服务器的数据
+        for data_encoded in data_list:
+            decoded = rsa.decrypt(data_encoded, self.g_key[1]) #反复解密数据
+            decoded_list.append(decoded)
         
-        decoded = rsa.decrypt(data, self.g_key[1]) #解密数据
+        all_decoded = b''.join(decoded_list)
+        
+        return all_decoded #返回解密后的数据
+    
+    def send(self,data): #发送数据
+        data_list = []
+        i = 0
+        max_message = round(self.bits/8-11)
 
-        return decoded #返回解密后的数据
+        while True:
+            if len(data)-1 <= (i+1)*max_message:
+                data_list.append(data[i*max_message:])
+                break
+            data_list.append(data[i*max_message:(i+1)*max_message])
+            i = i+1
+
+        encoded_list = []
+        for data_for in data_list:
+            added_data = rsa.encrypt(data_for,self.s_key) #用接收成功的公钥加密
+            encoded_list.append(added_data)
+
+        for encoded_send in encoded_list:
+            self.s.send(encoded_send) #把加密后的数据发送至客户端
+            time.sleep(0.05)
+        time.sleep(0.05)
+        self.s.send(b'done')
+
+        return 0 #发送成功返回0
 
     def close(self): #关闭socket
         self.s.close()
