@@ -1,10 +1,9 @@
 import os,sys
-sys.path.append(os.getcwd()+"\\..\\..\\..\\api\\TPWL_rsa_api")
-import TPWL_rsa
+sys.path.append(os.getcwd()+"/../")
+import TPWL
 
-s = TPWL_rsa.TPWL_C()
-s.create(1024)
-s.connect(("127.0.0.1",5000))
+s = TPWL.socket()
+s.connect(("127.0.0.1",5000),128)
 while True:
     data = input(">>>")
     s.send(data.encode())
