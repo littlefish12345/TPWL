@@ -11,7 +11,7 @@ p.s. You need to install rsa module before using this module.
 
 New features
 
-beta 0.17 Fix some bugs.
+beta 0.17 Fix some bugs and make TPWL more close to the socket.
 
 beta 0.15 Make two libs together.
 
