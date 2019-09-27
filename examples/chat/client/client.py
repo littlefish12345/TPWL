@@ -3,7 +3,7 @@ sys.path.append(os.getcwd()+"/../")
 import TPWL
 
 s = TPWL.socket()
-s.connect(("127.0.0.1",5000),128)
+s.connect(("127.0.0.1",5000))
 while True:
     data = input(">>>")
     s.send(data.encode())
