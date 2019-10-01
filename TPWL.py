@@ -2,7 +2,7 @@ import rsa,time
 import socket as sock
 
 def version(): #返回版本号
-    return 'beta 0.17'
+    return 'beta 0.18'
 
 class TPWL_CONN: #定义通讯类
     def __init__(self,conn,s_key,g_key,bits): #获取来自服务端类的收发密钥(公钥)
@@ -12,16 +12,27 @@ class TPWL_CONN: #定义通讯类
         self.bits = bits
     
     def recv(self,buffsize): #接收数据
-        data_list = []
-        data = self.conn.recv(buffsize) #接收来自客户端的数据
+        all_data = b''
         while True:
-            data_list.append(data)
-            data = self.conn.recv(buffsize) #反复接收来自客户端的数据
+            data = self.conn.recv(67108864) #接收来自客户端的数据
             if data == b'done':
                 break
+            else:
+                all_data = all_data+data
+
+        all_encoded_list = []
+        i = 0
+        one_pack_size = round(self.bits/8)
+        while True:
+            if len(all_data) <= (i+1)*one_pack_size:
+                all_encoded_list.append(all_data[i*one_pack_size:])
+                break
+            all_encoded_list.append(all_data[i*one_pack_size:(i+1)*one_pack_size])
+            i = i+1
+        
         decoded_list = []
 
-        for data_encoded in data_list:
+        for data_encoded in all_encoded_list:
             decoded = rsa.decrypt(data_encoded, self.g_key[1]) #反复解密数据
             decoded_list.append(decoded)
         
@@ -46,11 +57,23 @@ class TPWL_CONN: #定义通讯类
             added_data = rsa.encrypt(data_for,self.s_key) #用接收成功的公钥加密
             encoded_list.append(added_data)
 
-        for encoded_send in encoded_list:
-            self.conn.send(encoded_send) #把加密后的数据发送至客户端
+        all_data = b''.join(encoded_list)
+
+        all_data_pack = []
+        i = 0
+        while True:
+            if len(data) <= (i+1)*67108864:
+                all_data_pack.append(all_data[i*67108864:])
+                break
+            all_data_pack.append(all_data[i*67108864:(i+1)*67108864])
+            i = i+1
+        
+        for pack_data in all_data_pack:
+            self.conn.send(pack_data)
             time.sleep(0.01)
-        time.sleep(0.01)
         self.conn.send(b'done')
+
+        return 0 #发送成功返回0
 
     def close(self): #关闭这个连接
         self.conn.close()
@@ -107,21 +130,29 @@ class socket: #定义socket类
         return 0 #协议通讯成功返回0
 
     def recv(self,buffsize): #接收数据
-        data_list = []
-        data = self.s.recv(buffsize) #接收来自客户端的数据
+        all_data = b''
         while True:
-            data_list.append(data)
-            data = self.s.recv(buffsize) #反复接收来自客户端的数据
+            data = self.s.recv(67108864) #接收来自客户端的数据
             if data == b'done':
                 break
+            else:
+                all_data = all_data+data
+        all_encoded_list = []
+        i = 0
+        one_pack_size = round(self.bits/8)
+        while True:
+            if len(all_data) <= (i+1)*one_pack_size:
+                all_encoded_list.append(all_data[i*one_pack_size:])
+                break
+            all_encoded_list.append(all_data[i*one_pack_size:(i+1)*one_pack_size])
+            i = i+1
+        
         decoded_list = []
-
-        for data_encoded in data_list:
+        for data_encoded in all_encoded_list:
             decoded = rsa.decrypt(data_encoded, self.g_key[1]) #反复解密数据
             decoded_list.append(decoded)
         
         all_decoded = b''.join(decoded_list)
-        
         return all_decoded #返回解密后的数据
     
     def send(self,data): #发送数据
@@ -141,10 +172,20 @@ class socket: #定义socket类
             added_data = rsa.encrypt(data_for,self.s_key) #用接收成功的公钥加密
             encoded_list.append(added_data)
 
-        for encoded_send in encoded_list:
-            self.s.send(encoded_send) #把加密后的数据发送至客户端
+        all_data = b''.join(encoded_list)
+
+        all_data_pack = []
+        i = 0
+        while True:
+            if len(data) <= (i+1)*67108864:
+                all_data_pack.append(all_data[i*67108864:])
+                break
+            all_data_pack.append(all_data[i*67108864:(i+1)*67108864])
+            i = i+1
+        
+        for pack_data in all_data_pack:
+            self.s.send(pack_data)
             time.sleep(0.01)
-        time.sleep(0.01)
         self.s.send(b'done')
 
         return 0 #发送成功返回0
