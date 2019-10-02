@@ -16,11 +16,9 @@ class TPWL_CONN: #定义通讯类
         while True:
             data = self.conn.recv(67108864) #接收来自客户端的数据
             if data == b'done':
-                print('done')
                 break
             else:
                 all_data = all_data+data
-
         all_encoded_list = []
         i = 0
         one_pack_size = round(self.bits/8)
@@ -32,13 +30,12 @@ class TPWL_CONN: #定义通讯类
             i = i+1
         
         decoded_list = []
-
         for data_encoded in all_encoded_list:
             decoded = rsa.decrypt(data_encoded, self.g_key[1]) #反复解密数据
             decoded_list.append(decoded)
         
         all_decoded = b''.join(decoded_list)
-        
+        self.conn.send(b'done')
         return all_decoded #返回解密后的数据
     
     def send(self,data): #发送数据
@@ -74,7 +71,9 @@ class TPWL_CONN: #定义通讯类
             time.sleep(0.05)
         self.conn.send(b'done')
 
-        return 0 #发送成功返回0
+        if self.conn.recv(1024) == b'done':
+            return 0 #发送成功返回0
+        raise
 
     def close(self): #关闭这个连接
         self.conn.close()
@@ -154,6 +153,7 @@ class socket: #定义socket类
             decoded_list.append(decoded)
         
         all_decoded = b''.join(decoded_list)
+        self.s.send(b'done')
         return all_decoded #返回解密后的数据
     
     def send(self,data): #发送数据
@@ -189,7 +189,9 @@ class socket: #定义socket类
             time.sleep(0.05)
         self.s.send(b'done')
 
-        return 0 #发送成功返回0
+        if self.s.recv(1024) == b'done':
+            return 0 #发送成功返回0
+        raise
 
     def close(self): #关闭socket
         self.s.close()
