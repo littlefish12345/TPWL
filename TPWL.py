@@ -16,6 +16,7 @@ class TPWL_CONN: #定义通讯类
         while True:
             data = self.conn.recv(67108864) #接收来自客户端的数据
             if data == b'done':
+                print('done')
                 break
             else:
                 all_data = all_data+data
@@ -70,7 +71,7 @@ class TPWL_CONN: #定义通讯类
         
         for pack_data in all_data_pack:
             self.conn.send(pack_data)
-            time.sleep(0.01)
+            time.sleep(0.05)
         self.conn.send(b'done')
 
         return 0 #发送成功返回0
@@ -185,7 +186,7 @@ class socket: #定义socket类
         
         for pack_data in all_data_pack:
             self.s.send(pack_data)
-            time.sleep(0.01)
+            time.sleep(0.05)
         self.s.send(b'done')
 
         return 0 #发送成功返回0
