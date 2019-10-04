@@ -3,7 +3,7 @@ from Crypto.Cipher import AES
 import socket as sock
 
 def version(): #返回版本号
-    return 'v1.0'
+    return 'v1.1'
 
 def add_to_16(s):
     if len(s)%16 != 0:
@@ -27,13 +27,14 @@ class TPWL_CONN: #定义通讯类
             self.aes = AES.new(AES_key.encode(), AES.MODE_ECB)
     
     def recv(self,buffsize): #接收数据
-        all_data = b''
+        all_data_list = []
         while True:
             data = self.conn.recv(67108864) #接收来自客户端的数据
             if data == b'done':
                 break
             else:
-                all_data = all_data+data
+                all_data_list.append(data)
+        all_data = b''.join(all_data_list)
                 
         if self.fastmode:
             decoded = self.aes.decrypt(all_data) # 解密
@@ -175,14 +176,15 @@ class socket: #定义socket类
         return 0 #协议通讯成功返回0
 
     def recv(self,buffsize): #接收数据
-        all_data = b''
+        all_data_list = []
         while True:
-            data = self.s.recv(67108864) #接收来自客户端的数据
+            data = self.s.recv(67108864) #接收来自服务器的数据
             if data == b'done':
                 break
             else:
-                all_data = all_data+data
-                
+                all_data_list.append(data)
+        all_data = b''.join(all_data_list)
+        
         if self.fastmode:
             decoded = self.aes.decrypt(all_data) # 解密
             decoded = decoded[:-decoded[-1]] # 去除多余补位
