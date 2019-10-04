@@ -7,9 +7,11 @@ Please use this project correctly, thanks (but not for me :-D).
 
 May the force be with you. Always.
 
-p.s. You need to install rsa module before using this module.
+p.s. You need to install rsa and pycrypto module before using this module.
 
 New features
+
+v1.0 Add fast mode and fix some bugs
 
 beta 0.18 Make the speed much faster than beta 0.17.
 
