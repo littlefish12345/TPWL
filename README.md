@@ -11,6 +11,8 @@ p.s. You need to install rsa and pycrypto module before using this module.
 
 New features
 
+v1.1 Fix some bugs.
+
 v1.0 Add fast mode and fix some bugs
 
 beta 0.18 Make the speed much faster than beta 0.17.
