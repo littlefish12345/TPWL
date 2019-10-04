@@ -2,6 +2,8 @@ import rsa,time,random
 from Crypto.Cipher import AES
 import socket as sock
 
+__author__ = 'littlefish12345'
+
 def version(): #返回版本号
     return 'v1.1'
 
